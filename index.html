@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TÀI XỈU VIP - Casino Hoàng Gia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Playfair+Display:wght@700&display=swap');
+        
+        :root {
+            --gold: #facc15;
+            --red: #dc2626;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a0f2e, #2c0a1f);
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #4c1d95, #9f1239);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        
+        .dice {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .dice-container {
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0% { transform: rotate(-8deg); }
+            50% { transform: rotate(8deg); }
+            100% { transform: rotate(-8deg); }
+        }
+        
+        .result {
+            animation: pop 0.6s ease;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0.3); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        .bet-button {
+            transition: all 0.3s ease;
+        }
+        
+        .bet-button:hover {
+            transform: translateY(-8px) scale(1.08);
+            box-shadow: 0 20px 30px rgba(234, 179, 8, 0.4);
+        }
+        
+        .active-bet {
+            background: #eab308 !important;
+            color: black !important;
+            transform: scale(1.1);
+        }
+        
+        .history-item {
+            transition: all 0.4s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- HEADER -->
+    <header class="header py-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-dice text-4xl text-yellow-400"></i>
+                <div>
+                    <h1 class="text-3xl font-black tracking-widest">TÀI XỈU</h1>
+                    <p class="text-yellow-400 text-sm -mt-1">HOÀNG GIA CASINO</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-3 bg-black/40 px-6 py-3 rounded-2xl">
+                    <i class="fas fa-coins text-yellow-400 text-2xl"></i>
+                    <div>
+                        <p class="text-xs text-gray-400">SỐ DƯ</p>
+                        <p id="balance" class="text-2xl font-bold text-yellow-400">245,680,000</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-black/40 px-5 py-3 rounded-2xl">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold">LV8</div>
+                    <div>
+                        <p class="text-sm font-medium">Nguyễn Văn A</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-12 gap-8">
+        
+        <!-- LEFT - GAME AREA -->
+        <div class="col-span-12 lg:col-span-8">
+            <div class="bg-gradient-to-br from-zinc-900 to-black rounded-3xl p-8 shadow-2xl border border-yellow-400/20">
+                
+                <!-- TIMER -->
+                <div class="flex justify-center mb-6">
+                    <div class="bg-black/70 text-center px-10 py-4 rounded-2xl border border-red-500">
+                        <p class="text-red-400 text-sm tracking-widest">THỜI GIAN CÒN LẠI</p>
+                        <div id="timer" class="text-6xl font-black text-white tabular-nums">30</div>
+                    </div>
+                </div>
+
+                <!-- DICE AREA -->
+                <div class="flex justify-center gap-8 mb-10" id="dice-container">
+                    <div id="die1" class="dice text-6xl">🎲</div>
+                    <div id="die2" class="dice text-6xl">🎲</div>
+                    <div id="die3" class="dice text-6xl">🎲</div>
+                </div>
+
+                <div class="text-center mb-8">
+                    <div id="result-text" class="text-4xl font-black min-h-[60px] transition-all"></div>
+                    <div id="sum" class="text-5xl font-bold text-yellow-400"></div>
+                </div>
+
+                <!-- BET OPTIONS -->
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- TÀI -->
+                    <div onclick="placeBet('tai')" id="bet-tai"
+                         class="bet-button bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-3xl p-8 text-center cursor-pointer border-4 border-transparent">
+                        <h2 class="text-5xl font-black mb-2">TÀI</h2>
+                        <p class="text-2xl">11 - 18</p>
+                        <p class="text-sm mt-4 opacity-75">Tỷ lệ 1:0.95</p>
+                    </div>
+                    
+                    <!-- XỈU -->
+                    <div onclick="placeBet('xiu')" id="bet-xiu"
+                         class="bet-button bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-3xl p-8 text-center cursor-pointer border-4 border-transparent">
+                        <h2 class="text-5xl font-black mb-2">XỈU</h2>
+                        <p class="text-2xl">3 - 10</p>
+                        <p class="text-sm mt-4 opacity-75">Tỷ lệ 1:0.95</p>
+                    </div>
+                </div>
+
+                <!-- QUICK BET -->
+                <div class="mt-8">
+                    <p class="text-center text-gray-400 mb-3">Chọn mức cược nhanh</p>
+                    <div class="grid grid-cols-5 gap-3">
+                        <button onclick="quickBet(100000)" class="bg-white/10 hover:bg-white/20 py-4 rounded-2xl font-bold">100K</button>
+                        <button onclick="quickBet(500000)" class="bg-white/10 hover:bg-white/20 py-4 rounded-2xl font-bold">500K</button>
+                        <button onclick="quickBet(1000000)" class="bg-white/10 hover:bg-white/20 py-4 rounded-2xl font-bold">1M</button>
+                        <button onclick="quickBet(5000000)" class="bg-white/10 hover:bg-white/20 py-4 rounded-2xl font-bold">5M</button>
+                        <button onclick="quickBet(10000000)" class="bg-yellow-400 text-black hover:bg-yellow-300 py-4 rounded-2xl font-bold">10M</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="col-span-12 lg:col-span-4 space-y-6">
+            
+            <!-- BETTING INFO -->
+            <div class="bg-zinc-900/80 rounded-3xl p-6">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hand-holding-dollar"></i> Cược của bạn</h3>
+                <div id="current-bet" class="text-3xl font-black text-yellow-400 min-h-[50px]">Chưa đặt cược</div>
+                <button onclick="cancelBet()" class="w-full mt-4 bg-red-600 hover:bg-red-700 py-4 rounded-2xl font-bold">HỦY CƯỢC</button>
+            </div>
+
+            <!-- HISTORY -->
+            <div class="bg-zinc-900/80 rounded-3xl p-6">
+                <h3 class="text-xl font-bold mb-4">Lịch sử 20 ván</h3>
+                <div id="history" class="grid grid-cols-5 gap-3 text-center"></div>
+            </div>
+
+            <!-- STATISTICS -->
+            <div class="bg-zinc-900/80 rounded-3xl p-6">
+                <h3 class="text-xl font-bold mb-4">Thống kê</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <p class="text-green-400 text-4xl font-black" id="tai-count">12</p>
+                        <p class="text-sm">TÀI</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-blue-400 text-4xl font-black" id="xiu-count">8</p>
+                        <p class="text-sm">XỈU</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIN / LOSE MODAL -->
+    <div id="result-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div id="modal-content" class="rounded-3xl p-12 max-w-md"></div>
+        </div>
+    </div>
+
+    <script>
+        // =============== BIẾN GAME ===============
+        let balance = 245680000;
+        let currentBet = 0;
+        let currentBetType = null;
+        let timerInterval = null;
+        let timeLeft = 30;
+        let isRolling = false;
+        let history = [];
+
+        const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+        // =============== HÀM CHÍNH ===============
+        function updateBalance() {
+            document.getElementById('balance').textContent = balance.toLocaleString('vi-VN');
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            document.getElementById('timer').textContent = timeLeft;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if (timeLeft <= 5) {
+                    document.getElementById('timer').classList.add('text-red-500');
+                } else {
+                    document.getElementById('timer').classList.remove('text-red-500');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    rollDice();
+                }
+            }, 1000);
+        }
+
+        function placeBet(type) {
+            if (isRolling) return;
+            if (currentBet > 0) {
+                alert("Bạn chỉ được đặt 1 loại cược mỗi ván!");
+                return;
+            }
+            
+            const betAmount = 5000000; // Mặc định 5 triệu
+            if (betAmount > balance) {
+                alert("Số dư không đủ!");
+                return;
+            }
+            
+            currentBet = betAmount;
+            currentBetType = type;
+            
+            document.getElementById('current-bet').innerHTML = `
+                <span class="text-4xl">${type === 'tai' ? 'TÀI' : 'XỈU'}</span><br>
+                <span class="text-2xl text-yellow-400">${betAmount.toLocaleString('vi-VN')} ₫</span>
+            `;
+            
+            document.getElementById('bet-tai').classList.toggle('active-bet', type === 'tai');
+            document.getElementById('bet-xiu').classList.toggle('active-bet', type === 'xiu');
+        }
+
+        function quickBet(amount) {
+            if (isRolling || currentBet > 0) return;
+            if (amount > balance) {
+                alert("Số dư không đủ!");
+                return;
+            }
+            currentBet = amount;
+            currentBetType = 'tai'; // Mặc định
+            document.getElementById('current-bet').innerHTML = `
+                <span class="text-4xl">TÀI</span><br>
+                <span class="text-2xl text-yellow-400">${amount.toLocaleString('vi-VN')} ₫</span>
+            `;
+        }
+
+        function cancelBet() {
+            currentBet = 0;
+            currentBetType = null;
+            document.getElementById('current-bet').textContent = "Chưa đặt cược";
+            document.getElementById('bet-tai').classList.remove('active-bet');
+            document.getElementById('bet-xiu').classList.remove('active-bet');
+        }
+
+        async function rollDice() {
+            if (isRolling) return;
+            isRolling = true;
+            
+            const dice1 = document.getElementById('die1');
+            const dice2 = document.getElementById('die2');
+            const dice3 = document.getElementById('die3');
+            
+            // Hiệu ứng lắc xúc xắc
+            dice1.classList.add('dice-container');
+            dice2.classList.add('dice-container');
+            dice3.classList.add('dice-container');
+            
+            // Random 15 lần
+            for (let i = 0; i < 15; i++) {
+                dice1.textContent = diceFaces[Math.floor(Math.random()*6)];
+                dice2.textContent = diceFaces[Math.floor(Math.random()*6)];
+                dice3.textContent = diceFaces[Math.floor(Math.random()*6)];
+                await new Promise(r => setTimeout(r, 60));
+            }
+            
+            // Kết quả thật
+            const d1 = Math.floor(Math.random()*6) + 1;
+            const d2 = Math.floor(Math.random()*6) + 1;
+            const d3 = Math.floor(Math.random()*6) + 1;
+            
+            dice1.textContent = diceFaces[d1-1];
+            dice2.textContent = diceFaces[d2-1];
+            dice3.textContent = diceFaces[d3-1];
+            
+            dice1.classList.remove('dice-container');
+            dice2.classList.remove('dice-container');
+            dice3.classList.remove('dice-container');
+            
+            const sum = d1 + d2 + d3;
+            const isTai = sum >= 11;
+            
+            document.getElementById('sum').textContent = `Tổng = ${sum}`;
+            
+            // Xử lý kết quả cược
+            setTimeout(() => {
+                let win = false;
+                if (currentBet > 0) {
+                    if ((currentBetType === 'tai' && isTai) || (currentBetType === 'xiu' && !isTai)) {
+                        win = true;
+                        const winAmount = Math.floor(currentBet * 0.95);
+                        balance += currentBet + winAmount;
+                        showResultModal(true, winAmount);
+                    } else {
+                        balance -= currentBet;
+                        showResultModal(false, currentBet);
+                    }
+                }
+                
+                // Lưu lịch sử
+                history.unshift({sum: sum, isTai: isTai});
+                if (history.length > 20) history.pop();
+                renderHistory();
+                
+                updateBalance();
+                isRolling = false;
+                currentBet = 0;
+                currentBetType = null;
+                document.getElementById('current-bet').textContent = "Chưa đặt cược";
+                document.getElementById('bet-tai').classList.remove('active-bet');
+                document.getElementById('bet-xiu').classList.remove('active-bet');
+                
+                // Bắt đầu ván mới
+                setTimeout(() => {
+                    startTimer();
+                }, 2500);
+            }, 800);
+        }
+
+        function showResultModal(isWin, amount) {
+            const modal = document.getElementById('result-modal');
+            const content = document.getElementById('modal-content');
+            
+            if (isWin) {
+                content.innerHTML = `
+                    <div class="text-green-400 text-8xl mb-6">🎉</div>
+                    <h2 class="text-5xl font-black mb-4">CHÚC MỪNG!</h2>
+                    <p class="text-3xl">Bạn thắng</p>
+                    <p class="text-6xl font-black text-yellow-400 my-4">+${amount.toLocaleString('vi-VN')} ₫</p>
+                `;
+                content.className = "bg-gradient-to-br from-green-900 to-black rounded-3xl p-12";
+            } else {
+                content.innerHTML = `
+                    <div class="text-red-400 text-8xl mb-6">😢</div>
+                    <h2 class="text-5xl font-black mb-4">RẤT TIẾC</h2>
+                    <p class="text-3xl">Bạn thua</p>
+                    <p class="text-6xl font-black text-red-400 my-4">-${amount.toLocaleString('vi-VN')} ₫</p>
+                `;
+                content.className = "bg-gradient-to-br from-red-900 to-black rounded-3xl p-12";
+            }
+            modal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 2800);
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history');
+            container.innerHTML = '';
+            history.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `history-item text-xl font-bold p-3 rounded-2xl ${item.isTai ? 'bg-red-600' : 'bg-blue-600'}`;
+                div.textContent = item.sum;
+                container.appendChild(div);
+            });
+        }
+
+        // Khởi động game
+        window.onload = () => {
+            updateBalance();
+            startTimer();
+            renderHistory();
+            
+            // Demo history ban đầu
+            history = [
+                {sum: 15, isTai: true}, {sum: 8, isTai: false},
+                {sum: 12, isTai: true}, {sum: 9, isTai: false},
+                {sum: 17, isTai: true}
+            ];
+            renderHistory();
+        };
+
+        // Thêm hiệu ứng click toàn trang
+        document.addEventListener('click', function(e) {
+            if (Math.random() > 0.85) {
+                const sparkle = document.createElement('div');
+                sparkle.textContent = '✨';
+                sparkle.style.position = 'fixed';
+                sparkle.style.left = e.clientX + 'px';
+                sparkle.style.top = e.clientY + 'px';
+                sparkle.style.fontSize = '20px';
+                sparkle.style.zIndex = '9999';
+                sparkle.style.pointerEvents = 'none';
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => sparkle.remove(), 1200);
+            }
+        });
+    </script>
+</body>
+</html>
